@@ -40,7 +40,7 @@ class UserController extends Controller
             $user->syncRoles($request->roles);
         }
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('users.index');
     }
 
     public function update(UserRequest $request, User $user)
@@ -57,13 +57,13 @@ class UserController extends Controller
             $user->syncRoles($request->roles);
         }
 
-        return redirect()->route('admin.users.index');
+        return redirect()->route('users.index');
     }
 
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('admin.users.index');
+        return redirect()->route('users.index');
     }
 
     protected function userStore(Request $request): array

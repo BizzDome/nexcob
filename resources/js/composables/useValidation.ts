@@ -1,4 +1,4 @@
-import { ref, reactive, toRaw } from "vue";
+import { ref, reactive } from "vue";
 
 type ValidationRule =
     | 'required'
@@ -18,7 +18,7 @@ export default function useValidation<T extends Record<string, any>>() {
     const hasErrors = ref(false);
 
     const validate = (form: T, rules: ValidationRules<T>): boolean => {
-        // cleanErrors();
+        clearErrors();
 
         for (const field in rules) {
             const value = form[field];
@@ -76,14 +76,16 @@ export default function useValidation<T extends Record<string, any>>() {
     };
 
     const clearErrors = () => {
-        Object.keys(toRaw(errors)).forEach((key) => delete (toRaw(errors) as Partial<Record<keyof T, string>>)[key as keyof T]);
+        for (const key in errors) {
+            delete(errors as any)[key];
+        }
         hasErrors.value = false;
     };
 
     const setErrors = (serverErrors: Record<string, string[] | string>) => {
         clearErrors();
         for (const field in serverErrors) {
-            (toRaw(errors) as Partial<Record<keyof T, string>>)[field as keyof T] = Array.isArray(serverErrors[field])
+            (errors as any)[field] = Array.isArray(serverErrors[field])
                 ? serverErrors[field][0]
                 : serverErrors[field];
         }

@@ -19,8 +19,8 @@ Route::middleware(['auth'])->group(function () {
     Route::controller(UserController::class)->group(function (){
         Route::get('/admin/users', 'index')->name('users.index');
         Route::post('/admin/users', 'store')->name('users.store');
-        Route::put('/admin/users/{role}', 'update')->name('users.update');
-        Route::delete('/admin/users/{role}', 'destroy')->name('users.destroy');
+        Route::put('/admin/users/{user}', 'update')->name('users.update');
+        Route::delete('/admin/users/{user}', 'destroy')->name('users.destroy');
     });
 });
 
