@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 // import { Checkbox } from '@/components/ui/checkbox';
-import CheckboxRoles from '@/components/CheckboxRoles.vue';
+import Checkbox from '@/components/Checkbox.vue';
 import useModal from '@/composables/useModal'; 
 
 interface Props {
@@ -78,7 +78,6 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex flex-wrap gap-1">
-                                        {{ user.roles }}
                                         <span v-for="role in user.roles" :key="role.id"
                                             class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
                                             {{ role.name }}
@@ -146,22 +145,20 @@ const breadcrumbs: BreadcrumbItem[] = [
                     />
                     <InputError :message="errors.password_confirmation" />
 
-                    {{ form }}
-                    <CheckboxRoles
-                        :roles="roles"
-                        v-model="form.roles"
-                    />
-                    <!-- <div v-for="role in roles" :key="role.id">
-                        <label :for="role.name" class="px-2 py-1 cursor-pointer">
-                            <Checkbox 
-                                name="roles"
-                                :id="role.id"
-                                v-model="form.roles" 
-                                :value="role.id"
-                            />
-                            <span class="ml-2 font-semibold text-[13px] ">{{ role.name }}</span>
-                        </label>
-                    </div> -->
+                    <div class="px-4 py-5 rounded-lg flex flex-wrap items-center justify-around gap-2">
+                        <div v-for="role in roles" :key="role.id">
+                            <label :for="role.name" class="px-2 py-1 cursor-pointer">
+                                <Checkbox 
+                                    name="roles"
+                                    :id="role.id"
+                                    v-model:checked="form.roles" 
+                                    :value="role.id"
+                                />
+                                <span class="ml-2 font-semibold text-[13px]">{{ role.name }}</span>
+                            </label>
+                        </div>
+                    </div>
+                    <InputError :message="errors.roles" />
                 </div>
             </template>
         </EntityModal>

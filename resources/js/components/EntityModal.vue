@@ -1,8 +1,6 @@
 <script setup lang="ts">
-// import { ref } from 'vue';
+import { watch } from 'vue';
 import type { PropType } from 'vue';
-
-import { Button } from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
@@ -11,10 +9,8 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    // DialogTrigger,
 } from '@/components/ui/dialog';
-
-// import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
 
 type ModalType = 'create' | 'edit' | 'delete';
 
@@ -24,10 +20,8 @@ const props = defineProps({
         type: String as PropType<ModalType>,
         default: 'create'
     },
-    title: {
-        type: String,
-        default: '',
-    },
+    title: String,
+    description: String,
     form: {
         type: Object as PropType<Record<string, any>>,
         required: true,
@@ -36,43 +30,33 @@ const props = defineProps({
         type: Object as PropType<Record<string, string>>,
         default: () => ({}),
     },
-    isSubmitting: {
-        type: Boolean,
-        default: false,
-    },
-    isDeleting: {
-        type: Boolean,
-        default: false,
-    },
+    isSubmitting: Boolean,
+    isDeleting: Boolean,
 });
 
-const emit = defineEmits<{
-    (e: 'close'): void;
-    (e: 'submit'): void;
-    (e: 'delete'): void;
-}>();
+const emit = defineEmits(['close', 'submit', 'delete']);
 
-const closeModal = () => {
-    if (!props.isSubmitting && !props.isDeleting) emit('close');
-};
+watch(() => props.isOpen, (newVal, oldVal) => {
+    if (oldVal && !newVal) emit('close');
+});
 
-const submitForm = () => emit('submit');
-const deleteForm = () => emit('delete');
+const isActionDisabled = () => props.isSubmitting || props.isDeleting;
 </script>
 <template>
-    <Dialog :open="isOpen" @update:open="val => !val && closeModal()">
+    <Dialog :open="isOpen" @update:open="val => val || (!isActionDisabled() && emit('close'))">
         <DialogContent>
-            <DialogHeader class="space-y-3">
+            <DialogHeader>
                 <DialogTitle>
-                    {{ modalType === 'delete'
-                        ? 'Confirm Deletion'
-                        : modalType === 'edit'
-                            ? `Edit ${title}`
-                            : `Create ${title}`
-                    }}
+                    {{ {
+                        'delete': 'Confirm Deletion',
+                        'edit': `Edit ${title}`,
+                        'create': `Create ${title}`
+                    }[modalType] }}
                 </DialogTitle>
-                <DialogDescription v-if="modalType === 'delete'">
-                    Are you sure you want to delete this {{ title }}? This action cannot be undone.
+                <DialogDescription>
+                    {{ modalType === 'delete' 
+                        ? `Are you sure you want to delete this ${title}? This action cannot be undone.`
+                        : description }}
                 </DialogDescription>
             </DialogHeader>
 
@@ -82,13 +66,22 @@ const deleteForm = () => emit('delete');
 
             <DialogFooter class="gap-2">
                 <DialogClose as-child>
-                    <Button variant="secondary" @click="closeModal"> Cancel </Button>
+                    <Button variant="secondary" @click="emit('close')"> Cancel </Button>
                 </DialogClose>
 
-                <Button v-if="modalType === 'delete'" variant="destructive" @click="deleteForm" :disabled="isDeleting">
+                <Button 
+                    v-if="modalType === 'delete'" 
+                    variant="destructive" 
+                    @click="emit('delete')" 
+                    :disabled="isDeleting"
+                >
                     Delete
                 </Button>
-                <Button v-else :disabled="isSubmitting" @click="submitForm">
+                <Button 
+                    v-else 
+                    :disabled="isSubmitting" 
+                    @click="emit('submit')"
+                >
                     {{ modalType === 'edit' ? 'Update' : 'Create' }}
                 </Button>
             </DialogFooter>
