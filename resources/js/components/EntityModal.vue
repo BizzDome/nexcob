@@ -17,7 +17,7 @@ type ModalType = 'create' | 'edit' | 'delete';
 const props = defineProps({
     isOpen: Boolean,
     modalType: {
-        type: String as PropType<ModalType>,
+        type: String as PropType<ModalType | null>,
         default: 'create'
     },
     title: String,
@@ -51,7 +51,7 @@ const isActionDisabled = () => props.isSubmitting || props.isDeleting;
                         'delete': 'Confirm Deletion',
                         'edit': `Edit ${title}`,
                         'create': `Create ${title}`
-                    }[modalType] }}
+                    }[modalType || 'create'] }}
                 </DialogTitle>
                 <DialogDescription>
                     {{ modalType === 'delete' 
