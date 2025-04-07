@@ -11,6 +11,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { LoaderCircle } from 'lucide-vue-next';
 
 type ModalType = 'create' | 'edit' | 'delete';
 
@@ -60,7 +61,7 @@ const isActionDisabled = () => props.isSubmitting || props.isDeleting;
                 </DialogDescription>
             </DialogHeader>
 
-            <div v-if="modalType !== 'delete'" class="p-4">
+            <div v-if="modalType !== 'delete'" class="p-0">
                 <slot name="form" :form="form" :errors="errors" />
             </div>
 
@@ -75,6 +76,7 @@ const isActionDisabled = () => props.isSubmitting || props.isDeleting;
                     @click="emit('delete')" 
                     :disabled="isDeleting"
                 >
+                    <LoaderCircle v-if="isDeleting" class="h-4 w-4 animate-spin" />
                     Delete
                 </Button>
                 <Button 
@@ -82,6 +84,7 @@ const isActionDisabled = () => props.isSubmitting || props.isDeleting;
                     :disabled="isSubmitting" 
                     @click="emit('submit')"
                 >
+                    <LoaderCircle v-if="isSubmitting" class="h-4 w-4 animate-spin" />
                     {{ modalType === 'edit' ? 'Update' : 'Create' }}
                 </Button>
             </DialogFooter>
