@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+
+// Components
 import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Role, User, UserModel } from '@/models/User';
 import EntityModal from '@/components/EntityModal.vue';
-import { Input } from '@/components/ui/input';
-import InputError from '@/components/InputError.vue';
+import { InputForm } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-// import { Checkbox } from '@/components/ui/checkbox';
-import Checkbox from '@/components/Checkbox.vue';
+import { Checkboxnc } from '@/components/ui/checkbox';
+import GroupBox from '@/components/GroupBox.vue';
+
+// libraries
 import useModal from '@/composables/useModal'; 
+import { Role, User, UserModel } from '@/models/User';
+import { type BreadcrumbItem } from '@/types';
+import { UserPen, Trash, Lock, AtSign } from 'lucide-vue-next';
 
 interface Props {
     users: User[];
@@ -34,6 +38,20 @@ const {
 const validationRules = {
     name: ['required', { min: 3 }],
     email: ['required', { type: 'email' }],
+    password: [{
+        custom: (value: any, form: any) => {
+            if (!form.password && !form.password_confirmation) return true;
+            if (!value)  return 'Password is required';
+            return true;
+        }
+    }],
+    password_confirmation: [{
+        custom: (value: any, form: any) => {
+            if (!form.password && !value) return true;
+            if (!value) return 'Password confirmation is required';
+            return true;
+        }
+    }]
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -86,10 +104,10 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button @click="openModal('edit', user)" class="text-blue-600 hover:text-blue-900 mr-3">
-                                        Editar
+                                        <UserPen :size="20" :stroke-width="1.4" />
                                     </button>
                                     <button @click="openModal('delete', user)" class="text-red-600 hover:text-red-900">
-                                        Eliminar
+                                        <Trash :size="20" :stroke-width="1.4" />
                                     </button>
                                 </td>
                             </tr>
@@ -104,6 +122,7 @@ const breadcrumbs: BreadcrumbItem[] = [
             :isOpen="isModalOpen"
             :modalType="modalType"
             :title="'User'"
+            description="Enter the user information you want to create or modify."
             :form="form"
             :errors="errors"
             :isSubmitting="isSubmitting"
@@ -114,51 +133,57 @@ const breadcrumbs: BreadcrumbItem[] = [
         >
             <template #form="{ form, errors }">
                 <div class="space-y-4">
-                    <Input 
+
+                    <InputForm
                         id="name"
+                        type="text"
                         v-model="form.name" 
-                        placeholder="Name"
+                        placeholder="Fullname"
+                        :error="errors.name"
                     />
-                    <InputError :message="errors.name" />
-                    
-                    <Input 
-                        id="email" 
+
+                    <InputForm
+                        id="email"
                         type="email"
                         v-model="form.email" 
-                        placeholder="Email" 
+                        placeholder="E-mail"
+                        :icon="AtSign"
+                        :error="errors.email"
                     />
-                    <InputError :message="errors.email" />
-                    
-                    <Input 
+
+                    <InputForm
                         id="password"
                         type="password"
                         v-model="form.password" 
-                        placeholder="Password" 
+                        placeholder="Password"
+                        :icon="Lock"
+                        :error="errors.password"
                     />
-                    <InputError :message="errors.password" />
-
-                    <Input 
+                    
+                    <InputForm
                         id="password_confirmation"
                         type="password"
                         v-model="form.password_confirmation" 
-                        placeholder="Password confirmation" 
+                        placeholder="Password confirmation"
+                        :icon="Lock"
+                        :error="errors.password_confirmation"
                     />
-                    <InputError :message="errors.password_confirmation" />
-
-                    <div class="px-4 py-5 rounded-lg flex flex-wrap items-center justify-around gap-2">
-                        <div v-for="role in roles" :key="role.id">
-                            <label :for="role.name" class="px-2 py-1 cursor-pointer">
-                                <Checkbox 
-                                    name="roles"
-                                    :id="role.id"
-                                    v-model:checked="form.roles" 
-                                    :value="role.id"
-                                />
-                                <span class="ml-2 font-semibold text-[13px]">{{ role.name }}</span>
-                            </label>
-                        </div>
+                    
+                    <div>
+                        <GroupBox title="Type of access" :error="errors.roles" class="mt-6">
+                            <div class="grid gap-2">
+                                <div v-for="role in roles" :key="role.id">
+                                    <Checkboxnc 
+                                        name="roles"
+                                        :id="role.id"
+                                        v-model:checked="form.roles"
+                                        :value="role.id"
+                                        :label="role.name"
+                                    />
+                                </div>
+                            </div>
+                        </GroupBox>
                     </div>
-                    <InputError :message="errors.roles" />
                 </div>
             </template>
         </EntityModal>
