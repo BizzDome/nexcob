@@ -11,10 +11,19 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $roles = Role::query()
+            ->with('permissions')
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->per_page ?? 5);
+
+
         return Inertia::render('admin/roles/Index', [
-            'roles' => Role::with('permissions')->get(),
+            'roles' => $roles,
             'permissions' => Permission::all()
         ]);
     }
@@ -24,7 +33,7 @@ class RoleController extends Controller
         $role = Role::create(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
 
-        return redirect()->route('admin.roles.index');
+        return redirect()->route('roles.index');
     }
 
     public function update(RoleRequest $request, Role $role)
@@ -32,12 +41,12 @@ class RoleController extends Controller
         $role->update(['name' => $request->name]);
         $role->syncPermissions($request->permissions);
 
-        return redirect()->route('admin.roles.index');
+        return redirect()->route('roles.index');
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
-        return redirect()->route('admin.roles.index');
+        return redirect()->route('roles.index');
     }
 }
