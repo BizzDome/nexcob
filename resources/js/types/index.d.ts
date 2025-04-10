@@ -2,6 +2,13 @@ import type { PageProps } from '@inertiajs/core';
 import type { LucideIcon } from 'lucide-vue-next';
 import type { Config } from 'ziggy-js';
 
+// ======== Types project ========
+export * from './user';
+export * from './role';
+export * from './permission';
+export * from './datatable';
+// ======== Types project ========
+
 export interface Auth {
     user: User;
 }
@@ -24,16 +31,6 @@ export interface SharedData extends PageProps {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
-}
-
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    avatar?: string;
-    email_verified_at: string | null;
-    created_at: string;
-    updated_at: string;
 }
 
 export type BreadcrumbItemType = BreadcrumbItem;
