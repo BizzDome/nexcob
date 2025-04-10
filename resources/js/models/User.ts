@@ -1,38 +1,14 @@
-export interface User {
-    id?: number | string;
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation?: string;
-    roles: Role[];
-    created_at?: string;
-    updated_at?: string;
-}
-
-export interface Permission {
-    id?: number | string ;
-    name: string;
-    created_at?: string;
-    updated_at?: string;
-}
-
-export interface Role {
-    id?: number | string ;
-    name: string;
-    permissions: Permission[];
-    created_at?: string;
-    updated_at?: string;
-}
+import { type ExtendedUser } from '@/types';
 
 export const UserModel = {
-    base: (): User => ({
+    base: (): ExtendedUser => ({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
         roles: [],
     }),
-    hydrate: (data: Partial<User> = {}): User => ({
+    hydrate: (data: Partial<ExtendedUser> = {}): ExtendedUser => ({
         id: data.id ?? '',
         name: data.name ?? '',
         email: data.email ?? '',

@@ -54,7 +54,7 @@ const internalValue = computed({
                 :type="type"
                 v-bind="$attrs" 
                 :class="[
-                    'mt-1 block w-full', 
+                    'block w-full', 
                     icon ? 'pl-10' : '',
                     error ? 'ring-1 ring-destructive border-destructive focus-visible:ring-destructive': ''
                 ]"

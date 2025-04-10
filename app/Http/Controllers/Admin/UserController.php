@@ -12,13 +12,21 @@ use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with(['roles:id,name'])
+        $users = User::query()
+            ->with([
+                'roles:id,name'
+            ])
+            ->when($request->search, function ($query, $search) {
+                $query->whereAny(['name', 'email'], 'like', "%{$search}%");
+            })
             ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($user) {
-                $user->roles->each(fn ($role) => $role->makeHidden('pivot'));
+            ->paginate($request->per_page ?? 5)
+            ->through(function ($user) {
+                $user->roles->each(function ($role) {
+                    $role->makeHidden('pivot');
+                });
                 return $user;
             });
 
